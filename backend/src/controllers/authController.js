@@ -8,9 +8,11 @@ import asyncHandler from "../middleware/aysncHandler.js";
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, pass } = req.body;
 
+  if (!name || !email || !pass)
+    return res.status(400).json({ message: "All fields are required" });
   const isUserExist = await User.findOne({ email });
-  if (isUserExist) {
-    res.status(400).json({
+   if (isUserExist) {
+    return res.status(400).json({
       message: "User already exists",
     });
   }
