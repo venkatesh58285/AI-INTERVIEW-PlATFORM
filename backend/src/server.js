@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import authRoutes from "./routes/authRoutes.js"
+import authRoutes from "./routes/authRoutes.js";
+import resumeRoutes from "./routes/resumeRoutes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 
 dotenv.config();
@@ -18,6 +19,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth",authRoutes);
+
+app.use("/api/resume",resumeRoutes);
 
 app.use(errorMiddleware);
 const PORT = process.env.PORT || 5000;
