@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { StringDecoder } from "node:string_decoder";
 
 const userSchema = new mongoose.Schema(
   {
@@ -17,12 +18,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    resumeURI: {
+      type: String,
+    },
+    resumeText: {
+      type: String,
+    },
   },
   {
     timestamps: true,
   },
 );
 
-const User = mongoose.model("User",userSchema);
+const User = mongoose.model("User", userSchema);
 
 export default User;
