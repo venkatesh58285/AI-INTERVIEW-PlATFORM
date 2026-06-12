@@ -4,6 +4,7 @@ const require = createRequire(import.meta.url);
 const pdfParse = require("pdf-parse");
 import User from "../models/User.js";
 import asyncHandler from "../middleware/aysncHandler.js";
+import embedResume from "../services/rag/embedResume.js";
 
 const uploadResume = asyncHandler(async (req, res, next) => {
   if (!req.file) return res.status(400).json({ message: "File not found" });
@@ -20,6 +21,7 @@ const uploadResume = asyncHandler(async (req, res, next) => {
   user.resumeText = extractedText;
 
   await user.save();
+  await embedResume(user._id.toString(),extractedText);
 
   return res.status(200).json({
     success: true,
