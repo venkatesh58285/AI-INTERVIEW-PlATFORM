@@ -1,41 +1,23 @@
-import client from "./chromaClient.js";
-
+import Embedding from "../../models/Embedding.js";
 import chunkText from "./chunkText.js";
-
 import generateEmbedding from "./generateEmbeddings.js";
 
 const embedResume = async (userId, resumeText) => {
-  // chunk resume
+  // Remove old embeddings for this user
+  await Embedding.deleteMany({ userId });
+
+  // Chunk resume
   const chunks = chunkText(resumeText);
 
-  // create collection
-  const collection = await client.getOrCreateCollection({
-    name: "resumes",
-  });
-
-  // generate embeddings
-  const vectors = [];
-
+  // Generate embeddings and store in MongoDB
+  const docs = [];
   for (const chunk of chunks) {
     const embedding = await generateEmbedding(chunk);
-
-    vectors.push(embedding);
+    docs.push({ userId, chunk, embedding });
   }
 
-  // store embeddings
-  await collection.add({
-    ids: chunks.map((_, index) => `${userId}-${index}`),
-
-    documents: chunks,
-
-    embeddings: vectors,
-
-    metadatas: chunks.map(() => ({
-      userId,
-    })),
-  });
-
-  console.log("Resume embeddings stored");
+  await Embedding.insertMany(docs);
+  console.log(`Resume embeddings stored: ${docs.length} chunks`);
 };
 
 export default embedResume;

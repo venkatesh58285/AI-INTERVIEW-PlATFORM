@@ -1,31 +1,34 @@
-import client from "./chromaClient.js";
+import Embedding from "../../models/Embedding.js";
 import generateEmbedding from "./generateEmbeddings.js";
+
+// Cosine similarity between two vectors
+function cosineSimilarity(a, b) {
+  let dot = 0, magA = 0, magB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    magA += a[i] * a[i];
+    magB += b[i] * b[i];
+  }
+  return dot / (Math.sqrt(magA) * Math.sqrt(magB));
+}
+
 const retrieveResumeContext = async (userId, query) => {
-  const collection = await client.getCollection({
-    name: "resumes",
-  });
+  const userEmbeddings = await Embedding.find({ userId });
+
+  if (!userEmbeddings.length) return "";
 
   const queryEmbedding = await generateEmbedding(query);
 
-  const results = await collection.query({
-    queryEmbeddings: [queryEmbedding],
-    nResults: 3,
-  });
+  // Rank chunks by similarity
+  const scored = userEmbeddings.map((doc) => ({
+    chunk: doc.chunk,
+    score: cosineSimilarity(queryEmbedding, doc.embedding),
+  }));
 
-  const filteredDocs = [];
+  scored.sort((a, b) => b.score - a.score);
 
-  if (results.documents?.length > 0) {
-    const docs = results.documents[0];
-    const metadata = results.metadatas[0];
-
-    docs.forEach((doc, index) => {
-      if (metadata[index].userId === userId) {
-        filteredDocs.push(doc);
-      }
-    });
-  }
-
-  return filteredDocs.join("\n");
+  // Return top 3 most relevant chunks
+  return scored.slice(0, 3).map((s) => s.chunk).join("\n");
 };
 
 export default retrieveResumeContext;
