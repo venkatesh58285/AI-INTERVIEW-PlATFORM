@@ -38,6 +38,19 @@ const interviewSchema = new mongoose.Schema(
       default: "active",
     },
 
+    interviewType: {
+      type: String,
+      enum: ["resume", "system_design", "hr", "dsa"],
+      default: "resume",
+    },
+
+    totalQuestions: {
+      type: Number,
+      default: 6,
+      min: 3,
+      max: 10,
+    },
+
     currentRound: {
       type: String,
       default: "resume",
