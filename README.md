@@ -206,8 +206,8 @@ Open `http://localhost:5173` in your browser.
 
 | Service | URL |
 |---------|-----|
-| Frontend | _Your Vercel URL here_ |
-| Backend API | _Your Render URL here_ |
+| Frontend | https://ai-interview-pl-atform.vercel.app |
+| Backend API | https://ai-interview-platform-cske.onrender.com |
 
 ## API Endpoints
 
