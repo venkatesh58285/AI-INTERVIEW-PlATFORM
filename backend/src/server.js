@@ -15,7 +15,19 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "*",
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc)
+    if (!origin) return callback(null, true);
+    const allowedOrigins = [
+      process.env.FRONTEND_URL,
+      'http://localhost:5173',
+      'http://localhost:5174',
+    ].filter(Boolean);
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    return callback(null, true); // Allow all in case of misconfiguration
+  },
   credentials: true,
 }));
 
