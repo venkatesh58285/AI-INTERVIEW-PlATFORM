@@ -6,9 +6,9 @@ import errorMiddleware from "../middleware/errorMiddleware.js";
 import asyncHandler from "../middleware/aysncHandler.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, pass } = req.body;
+  const { name, email, password } = req.body;
 
-  if (!name || !email || !pass)
+  if (!name || !email || !password)
     return res.status(400).json({ message: "All fields are required" });
   const isUserExist = await User.findOne({ email });
    if (isUserExist) {
@@ -29,6 +29,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   const token = await generateToken(user._id);
 
   res.status(201).json({
+    success: true,
     message: "User Registered",
     token,
     user,
@@ -40,15 +41,16 @@ export const loginUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) {
     return res.status(401).json({
-      msg: "User not authorized",
+      message: "User not found",
     });
   }
-  const cmp = bcrypt.compare(password, user.password);
-  if (!cmp) return res.status(400).json({ msg: "password incorrect" });
+  const cmp = await bcrypt.compare(password, user.password);
+  if (!cmp) return res.status(400).json({ message: "Incorrect password" });
 
   const token = await generateToken(user._id);
 
   res.status(200).json({
+    success: true,
     message: "Login Successful",
     token,
     user,

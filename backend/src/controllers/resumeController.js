@@ -1,7 +1,5 @@
 import fs from "fs";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const pdfParse = require("pdf-parse");
+import { PDFParse } from "pdf-parse";
 import User from "../models/User.js";
 import asyncHandler from "../middleware/aysncHandler.js";
 import embedResume from "../services/rag/embedResume.js";
@@ -13,7 +11,8 @@ const uploadResume = asyncHandler(async (req, res, next) => {
 
   //read-pdf --> parse-pdf --> extract-text
   const dataBuffer = fs.readFileSync(resumeURI);
-  const pdfData = await pdfParse(dataBuffer);
+  const pdf = new PDFParse({ data: dataBuffer });
+  const pdfData = await pdf.getText();
   const extractedText = pdfData.text;
 
   const user = await User.findById(req.user._id);

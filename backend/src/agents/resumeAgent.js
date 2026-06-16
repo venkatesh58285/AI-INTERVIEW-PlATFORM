@@ -1,7 +1,7 @@
-import groqModel from "../services/ai/groqModel.js";
+import getGroqModel from "../services/ai/groqModel.js";
 import retrieveResumeContext from "../services/rag/retriveResumeContext.js";
 
-const generateResumeQuestion = async (userId, previousQuestions) => {
+const generateResumeQuestion = async (userId, previousQuestions = []) => {
   const context = await retrieveResumeContext(userId, "projects and skills");
   const prompt = `
 
@@ -20,6 +20,7 @@ Generate ONE NEW question.
 Do not repeat any previous question.
 
 `;
+  const groqModel = getGroqModel();
   const response = await groqModel.invoke(prompt);
   return response.content;
 };

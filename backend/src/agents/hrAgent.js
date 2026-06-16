@@ -1,4 +1,4 @@
-import groqModel from "../services/ai/groqModel.js";
+import getGroqModel from "../services/ai/groqModel.js";
 
 const generateHRQuestion = async (previousQuestions = []) => {
   const prompt = `
@@ -23,6 +23,7 @@ Do not repeat previous questions.
 
 `;
 
+  const groqModel = getGroqModel();
   const response = await groqModel.invoke(prompt);
 
   return response.content;

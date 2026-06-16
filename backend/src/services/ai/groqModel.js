@@ -1,11 +1,20 @@
 import { ChatGroq } from "@langchain/groq";
+import dotenv from "dotenv";
 
-const groqModel = new ChatGroq({
-  apiKey: process.env.GROQ_API_KEY,
+dotenv.config();
 
-  model: "llama-3.3-70b-versatile",
+let groqModel = null;
 
-  temperature: 0.7,
-});
+const getGroqModel = () => {
+  if (!groqModel) {
+    groqModel = new ChatGroq({
+      apiKey: process.env.GROQ_API_KEY,
+      model: "llama-3.3-70b-versatile",
+      temperature: 0.7,
+      maxRetries: 3,
+    });
+  }
+  return groqModel;
+};
 
-export default groqModel;
+export default getGroqModel;

@@ -1,9 +1,14 @@
-import groqModel from "../services/ai/groqModel.js";
+import getGroqModel from "../services/ai/groqModel.js";
 
-const generateReport = async (
-  interactions
-) => {
+const cleanJsonResponse = (text) => {
+  let cleaned = text.trim();
+  if (cleaned.startsWith("```")) {
+    cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, "").replace(/\n?```\s*$/, "");
+  }
+  return cleaned.trim();
+};
 
+const generateReport = async (interactions) => {
   const prompt = `
 You are a senior interviewer.
 
@@ -13,7 +18,7 @@ ${JSON.stringify(interactions)}
 
 Generate a final report.
 
-Return ONLY valid JSON.
+Return ONLY valid JSON with no extra text, no markdown, no code fences.
 
 {
   "strengths":[""],
@@ -22,26 +27,18 @@ Return ONLY valid JSON.
 }
 `;
 
-  const response =
-    await groqModel.invoke(prompt);
+  const groqModel = getGroqModel();
+  const response = await groqModel.invoke(prompt);
 
   try {
-
-    return JSON.parse(
-      response.content
-    );
-
+    return JSON.parse(cleanJsonResponse(response.content));
   } catch {
-
     return {
       strengths: [],
       weaknesses: [],
-      roadmap:
-        "Unable to generate roadmap",
+      roadmap: "Unable to generate roadmap",
     };
-
   }
-
 };
 
 export default generateReport;

@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { StringDecoder } from "node:string_decoder";
 
 const userSchema = new mongoose.Schema(
   {
